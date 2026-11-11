@@ -139,7 +139,6 @@ class HybridSearchView(APIView):
         turn_start_index = len(history_messages)
 
         try:
-
             result = agent_graph.invoke(
                 {
                     "messages": history_messages,

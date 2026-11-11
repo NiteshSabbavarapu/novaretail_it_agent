@@ -309,6 +309,7 @@ def after_agent(state: AgentState) -> str:
     2. If tools were already executed in this turn (either normal or forced) -> END.
     3. If the agent did not request a tool on its first pass -> evaluate intent ("classifier").
     """
+    print(state)
     last_msg = state["messages"][-1]
     tool_calls = getattr(last_msg, "tool_calls", None) or []
 
