@@ -4,7 +4,7 @@ import logging
 
 from rest_framework import status
 from rest_framework.exceptions import NotFound
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -12,7 +12,7 @@ from langchain_core.messages import HumanMessage, ToolMessage, AIMessage
 
 from core.agents import agent_graph
 from core.llm_utils import correct_query
-from core.models import Conversation, ChatMessage
+from core.models import Conversation, ChatMessage, User, get_anonymous_user
 
 
 logger = logging.getLogger(__name__)
@@ -75,7 +75,7 @@ def get_answer(messages):
 
 class HybridSearchView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def post(self, request):
 
@@ -93,22 +93,14 @@ class HybridSearchView(APIView):
         if len(query.split()) > 3:
             query = correct_query(query)
 
-        department_id = request.user.department_id
-
-        if not department_id:
-
-            return Response(
-                {"error": "User is not assigned to a department"},
-                status=status.HTTP_403_FORBIDDEN
-            )
+        department_id = 1  # IT department (shared demo workspace)
 
         conversation_id = request.data.get("conversation_id")
 
         if conversation_id:
 
             conversation = Conversation.objects.filter(
-                id=conversation_id,
-                user=request.user
+                id=conversation_id
             ).first()
 
             if not conversation:
@@ -116,8 +108,9 @@ class HybridSearchView(APIView):
 
         else:
 
+            anon_user = get_anonymous_user()
             conversation = Conversation.objects.create(
-                user=request.user,
+                user=anon_user,
                 title=query[:255]
             )
 

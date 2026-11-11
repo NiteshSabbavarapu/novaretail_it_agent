@@ -14,6 +14,7 @@ urlpatterns = [
     path("health/", HealthCheckView.as_view(), name="health-check"),
     path("conversations/", ConversationListView.as_view(), name="conversation-list"),
     path("conversations/<int:pk>/", ConversationDetailView.as_view(), name="conversation-detail"),
+    path("documents/", DocumentUploadView.as_view(), name="document-list"),
     path("documents/upload/", DocumentUploadView.as_view(), name="document-upload"),
     path("search/", HybridSearchView.as_view(), name="hybrid-search"),
     path("auth/register/", UserRegistrationView.as_view(), name="user-register"),

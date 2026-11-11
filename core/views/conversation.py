@@ -18,10 +18,10 @@ class HealthCheckView(APIView):
 
 
 class ConversationListView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get(self, request):
-        conversations = Conversation.objects.filter(user=request.user).order_by("-updated_at")
+        conversations = Conversation.objects.all().order_by("-updated_at")
         data = [
             {
                 "id": conv.id,
@@ -36,10 +36,10 @@ class ConversationListView(APIView):
 
 
 class ConversationDetailView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get(self, request, pk):
-        conv = Conversation.objects.filter(id=pk, user=request.user).first()
+        conv = Conversation.objects.filter(id=pk).first()
         if not conv:
             raise NotFound("Conversation not found.")
 

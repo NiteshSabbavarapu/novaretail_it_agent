@@ -1,17 +1,34 @@
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import DocumentChunk
+from core.models import Document, DocumentChunk
 from core.pdf_utils import extract_pdf_pages, chunk_text
 from core.serializers import DocumentSerializer
 from core.vector_utils import index_document_chunks
 
 class DocumentUploadView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     parser_classes = [MultiPartParser, FormParser]
+
+    def get(self, request):
+        docs = Document.objects.select_related("department").all().order_by("-created_at")
+        data = [
+            {
+                "id": doc.id,
+                "title": doc.title,
+                "department": doc.department_id,
+                "department_name": doc.department.name if doc.department else "IT",
+                "file_size": doc.file_size,
+                "status": doc.status,
+                "chunk_count": doc.chunks.count(),
+                "created_at": doc.created_at.isoformat(),
+            }
+            for doc in docs
+        ]
+        return Response(data, status=status.HTTP_200_OK)
 
     def post(self, request):
         serializer = DocumentSerializer(data=request.data, context={"request": request})

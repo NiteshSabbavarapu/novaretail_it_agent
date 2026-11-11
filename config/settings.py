@@ -157,7 +157,7 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
+        "rest_framework.permissions.AllowAny",
     ],
 }
 
@@ -165,6 +165,8 @@ REST_FRAMEWORK = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://localhost:8501",
+    "http://127.0.0.1:8501",
     "https://novaretail-it-agent.vercel.app",
 ]
 CORS_ALLOW_CREDENTIALS = True
@@ -176,4 +178,6 @@ CSRF_TRUSTED_ORIGINS = [
     "https://*.railway.app",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://localhost:8501",
+    "http://127.0.0.1:8501",
 ]

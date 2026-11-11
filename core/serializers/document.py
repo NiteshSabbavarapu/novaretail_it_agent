@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import Document
+from core.models import Document, get_anonymous_user
 from core.validators.pdf import validate_pdf
 
 
@@ -15,7 +15,8 @@ class DocumentSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        validated_data["uploaded_by"] = self.context["request"].user
+        user = self.context["request"].user if (self.context.get("request") and getattr(self.context["request"].user, "is_authenticated", False)) else get_anonymous_user()
+        validated_data["uploaded_by"] = user
         validated_data["file_size"] = validated_data["file"].size
         return super().create(validated_data)
 

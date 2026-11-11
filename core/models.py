@@ -139,3 +139,27 @@ class ChatMessage(models.Model):
 
     def __str__(self):
         return f"{self.role} - Conversation {self.conversation_id}"
+
+
+def get_anonymous_user():
+    """
+    Returns (or creates) a shared enterprise user for anonymous access.
+    Guarantees department_id=1 and role=EMPLOYEE without breaking foreign key constraints.
+    """
+    dept, _ = Department.objects.get_or_create(
+        id=1,
+        defaults={"name": "Information Technology", "description": "IT Department"}
+    )
+    user, _ = User.objects.get_or_create(
+        username="anonymous",
+        defaults={
+            "email": "anonymous@novaretail.internal",
+            "department": dept,
+            "role": User.Role.EMPLOYEE,
+        }
+    )
+    if user.department_id != dept.id:
+        user.department = dept
+        user.save(update_fields=["department"])
+    return user
+
