@@ -47,7 +47,9 @@ export default function Header() {
         {/* Backend Connectivity Status */}
         <div className="flex items-center gap-2 px-2.5 py-1 rounded border border-dark-700 bg-dark-850 text-xs font-mono">
           <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-          <span className="text-dark-300">Django API :8000</span>
+          <span className="text-dark-300">
+            {import.meta.env.VITE_API_BASE_URL?.includes('railway') ? 'Django API (Railway)' : 'Django API'}
+          </span>
         </div>
 
         {/* User Pill & Logout */}

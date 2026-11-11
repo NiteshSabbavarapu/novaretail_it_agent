@@ -26,11 +26,23 @@ export function AuthProvider({ children }) {
       setIsAuthenticated(true);
       return { success: true };
     } catch (err) {
-      const errMsg =
+      let errMsg =
         err.response?.data?.detail ||
         err.response?.data?.error ||
-        err.response?.data?.non_field_errors?.[0] ||
-        'Authentication failed. Please verify your credentials.';
+        err.response?.data?.non_field_errors?.[0];
+
+      if (!errMsg) {
+        if (err.code === 'ERR_NETWORK' || err.message === 'Network Error') {
+          errMsg = 'Network error. Could not connect to the backend server. Please check CORS settings and server status.';
+        } else if (err.response?.status === 500) {
+          errMsg = 'Internal server error (500). Please check Django backend logs.';
+        } else if (err.response?.status === 400 && typeof err.response?.data === 'string' && err.response?.data.includes('DisallowedHost')) {
+          errMsg = 'Backend Error: DisallowedHost (400). Please add your host to ALLOWED_HOSTS in Django settings.';
+        } else {
+          errMsg = 'Authentication failed. Please verify your credentials.';
+        }
+      }
+
       return { success: false, error: errMsg };
     }
   };
@@ -42,7 +54,11 @@ export function AuthProvider({ children }) {
       return await login(user, pass);
     } catch (err) {
       let errMsg = 'Registration failed.';
-      if (err.response?.data) {
+      if (err.code === 'ERR_NETWORK' || err.message === 'Network Error') {
+        errMsg = 'Network error. Could not connect to the backend server. Please check CORS settings and server status.';
+      } else if (err.response?.status === 500) {
+        errMsg = 'Internal server error (500). Please check Django backend logs.';
+      } else if (err.response?.data) {
         const errors = err.response.data;
         if (typeof errors === 'object') {
           const firstKey = Object.keys(errors)[0];

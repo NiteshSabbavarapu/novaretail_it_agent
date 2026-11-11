@@ -27,7 +27,15 @@ SECRET_KEY = 'django-insecure-p!0@4m5=gfa%t4gx)2xs1kcp6$l$j2*a-26=sxj(czeviw96vh
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
+ALLOWED_HOSTS = [
+    'http://localhost:3000/'
+    'localhost',
+    '127.0.0.1',
+    '0.0.0.0',
+    'novaretailitagent-production.up.railway.app',
+    '.railway.app',
+    '*',
+]
 
 
 # Application definition
@@ -160,3 +168,12 @@ CORS_ALLOWED_ORIGINS = [
     "https://novaretail-it-agent.vercel.app",
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+# CSRF trusted origins for deployed frontend and Railway domains
+CSRF_TRUSTED_ORIGINS = [
+    "https://novaretail-it-agent.vercel.app",
+    "https://novaretailitagent-production.up.railway.app",
+    "https://*.railway.app",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]

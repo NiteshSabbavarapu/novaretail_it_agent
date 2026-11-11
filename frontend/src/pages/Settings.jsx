@@ -122,7 +122,7 @@ export default function Settings() {
                   type="text"
                   value={localApiUrl}
                   onChange={(e) => setLocalApiUrl(e.target.value)}
-                  placeholder="/api"
+                  placeholder="https://novaretailitagent-production.up.railway.app"
                   className="flex-1 bg-dark-950 border border-dark-700 rounded-lg px-3 py-2 text-xs text-dark-100 focus:outline-none focus:border-brand-purple"
                 />
                 <button
@@ -133,7 +133,7 @@ export default function Settings() {
                 </button>
               </div>
               <p className="text-[10px] text-dark-500 mt-1">
-                Vite dev proxy forwards <code className="text-dark-300">/api/*</code> to Django on port 8000.
+                Configured via <code className="text-dark-300">VITE_API_BASE_URL</code> (defaults to deployed Railway backend or /api).
               </p>
             </div>
           </form>

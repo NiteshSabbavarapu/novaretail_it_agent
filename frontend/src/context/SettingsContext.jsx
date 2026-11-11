@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { getApiBaseUrl, normalizeApiUrl, apiClient } from '../services/api';
 
 const SettingsContext = createContext(null);
 
 export function SettingsProvider({ children }) {
-  const [apiUrl, setApiUrl] = useState(() => localStorage.getItem('novaretail_api_url') || '/api');
+  const [apiUrl, setApiUrl] = useState(() => getApiBaseUrl());
 
   // Architecture parameters (fixed to match backend vector_utils.py & agents.py)
   const rrfK = 60;
@@ -14,7 +15,11 @@ export function SettingsProvider({ children }) {
   const pineconeIndex = 'novaretail-index';
 
   useEffect(() => {
-    localStorage.setItem('novaretail_api_url', apiUrl);
+    if (apiUrl) {
+      const normalized = normalizeApiUrl(apiUrl);
+      localStorage.setItem('novaretail_api_url', normalized);
+      apiClient.defaults.baseURL = normalized;
+    }
   }, [apiUrl]);
 
   const value = {
