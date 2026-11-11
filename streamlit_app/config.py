@@ -17,7 +17,7 @@ load_dotenv(ROOT_DIR / ".env")
 
 # Deployed Railway backend URL
 _DEFAULT_URL = "https://novaretailitagent-production.up.railway.app/api"
-_raw_url = os.getenv("API_BASE_URL", _DEFAULT_URL).strip().rstrip("/")
+_raw_url = os.getenv("VITE_API_BASE_URL", _DEFAULT_URL).strip().rstrip("/")
 
 # Normalize so it always ends with /api without duplication
 if not _raw_url.endswith("/api"):
