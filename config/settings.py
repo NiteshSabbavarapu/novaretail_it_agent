@@ -160,7 +160,6 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.AllowAny",
     ],
 }
-
 # CORS — allow Vite dev server to call Django directly (and via proxy)
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
