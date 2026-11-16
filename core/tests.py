@@ -1,3 +1,9 @@
+import os
+import django
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+django.setup()
+
 from django.test import TestCase
 from rest_framework.test import APIClient
 from core.models import get_anonymous_user, Department, User
@@ -24,4 +30,9 @@ class AnonymousAccessTests(TestCase):
     def test_documents_list_unauthenticated(self):
         resp = self.client.get("/api/documents/")
         self.assertEqual(resp.status_code, 200)
+
+
+if __name__ == "__main__":
+    import unittest
+    unittest.main()
 

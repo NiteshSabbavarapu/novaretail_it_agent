@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 
 
 class Department(models.Model):
@@ -75,15 +77,74 @@ class Document(models.Model):
         return self.title
 
 
+class DocumentParentChunk(models.Model):
+    class ContentType(models.TextChoices):
+        TEXT = "text", "Text"
+        TABLE = "table", "Table"
+        IMAGE = "image", "Image"
+
+    document = models.ForeignKey(
+        Document,
+        on_delete=models.CASCADE,
+        related_name="parent_chunks",
+    )
+    parent_id = models.CharField(max_length=100, db_index=True)
+    section_id = models.CharField(max_length=100, blank=True)
+    section_title = models.CharField(max_length=255, blank=True)
+    content_type = models.CharField(
+        max_length=20,
+        choices=ContentType.choices,
+        default=ContentType.TEXT,
+    )
+    content = models.TextField()
+    page_start = models.PositiveIntegerField()
+    page_end = models.PositiveIntegerField()
+    metadata = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["id"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["document", "parent_id"],
+                name="unique_document_parent_id",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.document.title} - Parent {self.parent_id} ({self.content_type})"
+
+
 class DocumentChunk(models.Model):
+    class ContentType(models.TextChoices):
+        TEXT = "text", "Text"
+        TABLE = "table", "Table"
+        IMAGE = "image", "Image"
+
     document = models.ForeignKey(
         Document,
         on_delete=models.CASCADE,
         related_name="chunks",
     )
+    parent = models.ForeignKey(
+        DocumentParentChunk,
+        on_delete=models.CASCADE,
+        related_name="children",
+        null=True,
+        blank=True,
+    )
+    parent_id_str = models.CharField(max_length=100, blank=True, db_index=True)
+    section_id = models.CharField(max_length=100, blank=True)
+    section_title = models.CharField(max_length=255, blank=True)
+    content_type = models.CharField(
+        max_length=20,
+        choices=ContentType.choices,
+        default=ContentType.TEXT,
+    )
     content = models.TextField()
     chunk_index = models.PositiveIntegerField()
     page_number = models.PositiveIntegerField()
+    metadata = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -162,4 +223,16 @@ def get_anonymous_user():
         user.department = dept
         user.save(update_fields=["department"])
     return user
+
+
+@receiver(pre_delete, sender=Document)
+def cleanup_document_vectors_on_delete(sender, instance, **kwargs):
+    """Cleans up Pinecone vectors when a Document is deleted from PostgreSQL."""
+    try:
+        from core.vector_utils import delete_document_vectors
+        chunk_ids = list(instance.chunks.values_list("id", flat=True))
+        delete_document_vectors(instance.id, chunk_ids=chunk_ids)
+    except Exception:
+        pass
+
 

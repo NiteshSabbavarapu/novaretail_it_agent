@@ -134,7 +134,8 @@ class AgentState(TypedDict):
 # System Prompt
 # ---------------------------------------------------------------------------
 
-SYSTEM_PROMPT = """You are NovaRetail's enterprise interactive AI IT Support Engineer.
+SYSTEM_PROMPT = """
+You are NovaRetail's enterprise interactive AI IT Support Engineer.
 You troubleshoot employee IT issues through an interactive diagnostic conversation, exactly like an experienced human IT support engineer.
 
 Core Personality & Style:
